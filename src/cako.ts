@@ -5,11 +5,20 @@ import { CakoModel, CakoModelConfig, defaultCakoModelConfig, CakoModelDefine, Ca
 import * as extend from 'extend';
 
 export interface CakoServerConfig {
+    /**
+     * http listen port
+     */
     port: number
 }
 
 export interface CakoConfig {
+    /**
+     * cako model config
+     */
     model?: CakoModelConfig,
+    /**
+     * cako server config
+     */
     server?: CakoServerConfig
 }
 
@@ -23,14 +32,20 @@ const defaultCakoConfig: CakoConfig = {
 };
 
 export class Cako {
-    // cako config object
+    /**
+     * cako config object
+     */
     private config: CakoConfig;
 
-    // koa.js server object & koa-router object
+    /**
+     * koa.js server instance & koa-router instance
+     */
     private server: Koa;
     private router: KoaRouter;
     
-    // cako model object
+    /**
+     * cako model instance
+     */
     private model: CakoModel;
 
     /**
