@@ -16,6 +16,7 @@ export interface CakoConfig {
      * cako model config
      */
     model?: CakoModelConfig,
+
     /**
      * cako server config
      */

@@ -1,25 +1,100 @@
 import { Sequelize, Options, Model, ModelAttributes, ModelOptions, BuildOptions, HasManyOptions } from 'sequelize';
 
 export interface CakoModelConfig {
+    /**
+     * if `useModel` option is `false`, cako will use no database
+     */
     useModel?: boolean,
+
+    /**
+     * database name
+     */
     database?: string,
+
+    /**
+     * login username of database
+     */
     username?: string,
+
+    /**
+     * login password of database
+     */
     password?: string,
+
+    /**
+     * sequelize db options, which is a `Options` object
+     */
     options?: Options
 }
 
+/**
+ * for example:
+ * 
+ * ```javascript
+ * cako.defineModel({
+ *     name: 'user',
+ *     attributes: {
+ *         id: {
+ *             type: Sequelize.BIGINT,
+ *             unique: true,
+ *             autoIncrement: true,
+ *             primaryKey: true
+ *         }
+ *     }
+ * });
+ * ```
+ */
 export interface CakoModelDefine {
+    /**
+     * model name
+     */
     name: string,
+
+    /**
+     * model attributes, which is a `ModelAttributes` object
+     */
     attributes: ModelAttributes,
+
+    /**
+     * model options, which is a `ModelOptions` object
+     */
     options?: ModelOptions
 }
 
+/**
+ * for example:
+ * ```javascript
+ * cako.defineRelation({
+ *      owner: ['user', 'comment'],
+ *      through: 'userComment',
+ *      extraAttributes: {
+ *          check: {
+ *              type: Sequelize.BOOLEAN
+ *          }
+ *      }
+ * });
+ * ```
+ */
 export interface CakoRelationDefineMany2ManyDescription {
+    /**
+     * owner of many-to-many relation (two owner)
+     */
     owner: string[],
+
+    /**
+     * through table name
+     */
     through?: string,
+
+    /**
+     * extra attributes of table, where is a `ModelAttributes` object
+     */
     extraAttributes?: ModelAttributes
 }
 
+/**
+ * TODO
+ */
 export interface CakoRelationDefineOne2ManyDescription {
     owner: string,
     to: string,
