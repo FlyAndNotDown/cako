@@ -59,12 +59,7 @@ export class CakoModel {
     private models: CakoModels;
     
     constructor(config?: CakoModelConfig) {
-        if (config) {
-            // TODO deep copy
-            this.config = config;
-        } else {
-            this.config = defaultCakoModelConfig;
-        }
+        this.config = config;
 
         if (this.config.useModel) {
             if (this.config.database && this.config.username && this.config.password && this.config.options) {
