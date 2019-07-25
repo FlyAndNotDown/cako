@@ -182,7 +182,7 @@ export class CakoModel {
     private database: Sequelize;
     private models: CakoModels;
     
-    constructor(config?: CakoModelConfig) {
+    constructor(config: CakoModelConfig) {
         this.config = config;
 
         if (this.config.useModel) {
@@ -212,6 +212,14 @@ export class CakoModel {
             this.database = null;
             this.models = null; 
         }
+    }
+
+    public getDatabase(): Sequelize {
+        return this.database;
+    }
+
+    public getModels(): CakoModels {
+        return this.models;
     }
 
     public defineModel(modelDefine: CakoModelDefine): void {

@@ -1,6 +1,8 @@
+import { CakoViewConfig, defaultCakoViewConfig } from './view';
+import { CakoController, defaultCakoControllerConfig, CakoControllerConfig, CakoControllerDefine } from './controller';
 import * as Koa from 'koa';
 import * as KoaRouter from 'koa-router';
-import { Sequelize, Options } from 'sequelize';
+import { CakoView } from './view';
 import { CakoModel, CakoModelConfig, defaultCakoModelConfig, CakoModelDefine, CakoRelationDefine } from './model';
 import * as extend from 'extend';
 
@@ -18,9 +20,19 @@ export interface CakoConfig {
     model?: CakoModelConfig,
 
     /**
+     * cako controller config
+     */
+    controller?: CakoControllerConfig,
+
+    /**
+     * cako view config
+     */
+    view?: CakoViewConfig,
+
+    /**
      * cako server config
      */
-    server?: CakoServerConfig
+    server?: CakoServerConfig,
 }
 
 const defaultCakoServerConfig: CakoServerConfig = {
@@ -29,6 +41,8 @@ const defaultCakoServerConfig: CakoServerConfig = {
 
 const defaultCakoConfig: CakoConfig = {
     model: defaultCakoModelConfig,
+    controller: defaultCakoControllerConfig,
+    view: defaultCakoViewConfig,
     server: defaultCakoServerConfig
 };
 
@@ -39,6 +53,8 @@ export class Cako {
     private router: KoaRouter;
     
     private model: CakoModel;
+    private controller: CakoController;
+    private view: CakoView;
 
     /**
      * constructor of Cako class
@@ -70,6 +86,17 @@ export class Cako {
 
     private loadModel(): Cako {
         this.model = new CakoModel(this.config.model);
+        return this;
+    }
+
+    private loadController(): Cako {
+        this.controller = new CakoController(this.config.controller);
+        return this;
+    }
+
+    private loadView(): Cako {
+        this.view = new CakoView(this.config.view, this.model, this.controller, this.router);
+        this.view.load();
         return this;
     }
 
@@ -111,6 +138,31 @@ export class Cako {
     }
 
     /**
+     * usage:
+     * ```javascript
+     * cako.defineController({
+     *      url: '/home',
+     *      get: (database, models) => {
+     *          return async (context, next) => {
+     *              await next();
+     * 
+     *              // ......
+     *          } 
+     *      },
+     *      // post: ...
+     * });
+     * ```
+     * 
+     * where `controllerDefine` is a `CakoControllerDefine` object
+     * @param controllerDefine controller define object
+     * @returns this `Cako` instance
+     */
+    public defineController(controllerDefine: CakoControllerDefine): Cako {
+        this.controller.defineController(controllerDefine);
+        return this;
+    }
+
+    /**
      * start cako server
      * 
      * ```javascript
@@ -122,6 +174,8 @@ export class Cako {
         return this
             .init()
             .loadModel()
+            .loadController()
+            .loadView()
             .listen();
     }
 }
