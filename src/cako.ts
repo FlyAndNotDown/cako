@@ -1,3 +1,4 @@
+import { CakoMiddlewareConfig, defaultCakoMiddlewareConfig } from './middleware';
 import { CakoViewConfig, defaultCakoViewConfig } from './view';
 import { CakoController, defaultCakoControllerConfig, CakoControllerConfig, CakoControllerDefine } from './controller';
 import * as Koa from 'koa';
@@ -29,6 +30,11 @@ export interface CakoConfig {
      * cako view config
      */
     view?: CakoViewConfig,
+
+    /**
+     * cako middleware config
+     */
+    middleware: CakoMiddlewareConfig,
 
     /**
      * cako server config
@@ -77,6 +83,7 @@ const defaultCakoConfig: CakoConfig = {
     model: defaultCakoModelConfig,
     controller: defaultCakoControllerConfig,
     view: defaultCakoViewConfig,
+    middleware: defaultCakoMiddlewareConfig,
     server: defaultCakoServerConfig
 };
 
