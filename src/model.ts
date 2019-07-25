@@ -1,3 +1,4 @@
+import { CakoRelationDefineMany2ManyDescription, CakoRelationDefineOne2ManyDescription, CakoRelationDefineHasOneDescription } from './model';
 import { Sequelize, Options, Model, ModelAttributes, ModelOptions, BuildOptions, HasManyOptions } from 'sequelize';
 
 export interface CakoModelConfig {
@@ -65,11 +66,14 @@ export interface CakoModelDefine {
  * for example:
  * ```javascript
  * cako.defineRelation({
- *      owner: ['user', 'comment'],
- *      through: 'userComment',
- *      extraAttributes: {
- *          check: {
- *              type: Sequelize.BOOLEAN
+ *      type: 'many2many',
+ *      description: {
+ *          owner: ['user', 'role'],
+ *          through: 'userRole',
+ *          extraAttributes: {
+ *              check: {
+ *                  type: Sequelize.BOOLEAN
+ *              }
  *          }
  *      }
  * });
@@ -93,22 +97,67 @@ export interface CakoRelationDefineMany2ManyDescription {
 }
 
 /**
- * TODO
+ * for example:
+ * ```javascript
+ * cako.defineRelation({
+ *      type: 'one2many',
+ *      description: {
+ *          owner: 'user',
+ *          to: 'message',
+ *          as: 'creator'
+ *      }
+ * });
+ * ```
  */
 export interface CakoRelationDefineOne2ManyDescription {
+    /**
+     * 'one' model in one-to-many relation
+     */
     owner: string,
+
+    /**
+     * 'many' model in one-to-many relation
+     */
     to: string,
+
+    /**
+     * 'one' model displayed on 'many' model field
+     */
     as?: string
 }
 
 export interface CakoRelationDefineHasOneDescription {
+    /**
+     * model which has 'one'
+     */
     owner: string,
+
+    /**
+     * 'one' model in the relation
+     */
     to: string,
+
+    /**
+     * 'one' model displayed on the owner model
+     */
     as?: string
 }
 
 export interface CakoRelationDefine {
+    /**
+     * type of 'relationship':
+     * * `many2many` - the many-to-many relation
+     * * `one2many` - the one-to-many relation
+     * * `hasOne` - the has-one relation
+     */
     type: 'many2many' | 'one2many' | 'hasOne',
+    
+    /**
+     * the detail description of relation:
+     * * where relation type is `many2many`, type of description is `CakoRelationDefineMany2ManyDescription`
+     * * where relation type is `one2many`, type of description is `CakoRelationDefineOne2ManyDescription`
+     * * where relation type os `hasOne`, type os description is `CakoRelationDefineHasOneDescription`
+     */
     description: CakoRelationDefineMany2ManyDescription | CakoRelationDefineOne2ManyDescription | CakoRelationDefineHasOneDescription
 }
 

@@ -33,20 +33,11 @@ const defaultCakoConfig: CakoConfig = {
 };
 
 export class Cako {
-    /**
-     * cako config object
-     */
     private config: CakoConfig;
 
-    /**
-     * koa.js server instance & koa-router instance
-     */
     private server: Koa;
     private router: KoaRouter;
     
-    /**
-     * cako model instance
-     */
     private model: CakoModel;
 
     /**
@@ -71,32 +62,17 @@ export class Cako {
         }
     }
 
-    /**
-     * init function of `Cako` class, to init all settings about koa.js,
-     * including koa.js object & koa-router object
-     * @private
-     * @returns this `Cako` instance
-     */
     private init(): Cako {
         this.server = new Koa();
         this.router = new KoaRouter();
         return this;
     }
 
-    /**
-     * load cako model. this function will create a `CakoModel` instance & save
-     * it to local variable
-     * @returns this Cako instance
-     */
     private loadModel(): Cako {
         this.model = new CakoModel(this.config.model);
         return this;
     }
 
-    /**
-     * start listen on http port which user set
-     * @returns this `Cako` instance
-     */
     private listen(): Cako {
         this.server.listen(this.config.server.port);
         return this;
