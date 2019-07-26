@@ -1,7 +1,7 @@
-import { CakoMiddlewareConfig, defaultCakoMiddlewareConfig } from './middleware';
 import { CakoViewConfig, defaultCakoViewConfig } from './view';
 import { CakoController, defaultCakoControllerConfig, CakoControllerConfig, CakoControllerDefine } from './controller';
 import * as Koa from 'koa';
+import { Middleware } from 'koa';
 import * as KoaRouter from 'koa-router';
 import { CakoView } from './view';
 import { CakoModel, CakoModelConfig, defaultCakoModelConfig, CakoModelDefine, CakoRelationDefine, CakoModels } from './model';
@@ -30,11 +30,6 @@ export interface CakoConfig {
      * cako view config
      */
     view?: CakoViewConfig,
-
-    /**
-     * cako middleware config
-     */
-    middleware: CakoMiddlewareConfig,
 
     /**
      * cako server config
@@ -83,7 +78,6 @@ const defaultCakoConfig: CakoConfig = {
     model: defaultCakoModelConfig,
     controller: defaultCakoControllerConfig,
     view: defaultCakoViewConfig,
-    middleware: defaultCakoMiddlewareConfig,
     server: defaultCakoServerConfig
 };
 
@@ -288,6 +282,16 @@ export class Cako {
      */
     public defineController(controllerDefine: CakoControllerDefine): Cako {
         this.controller.defineController(controllerDefine);
+        return this;
+    }
+
+    /**
+     * use koa middleware
+     * @param middleware koa middleware
+     * @returns this `Cako` instance
+     */
+    public useMiddleware(middleware: Middleware): Cako {
+        this.server.use(middleware);
         return this;
     }
 
