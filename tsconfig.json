@@ -3,6 +3,7 @@
         "module": "commonjs",
         "target": "es2015",
         "noImplicitAny": true,
+        "declaration": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
