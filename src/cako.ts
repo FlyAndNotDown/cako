@@ -1,12 +1,11 @@
 import { CakoViewConfig, defaultCakoViewConfig } from './view';
 import { CakoController, defaultCakoControllerConfig, CakoControllerConfig, CakoControllerDefine } from './controller';
 import * as Koa from 'koa';
-import { Middleware } from 'koa';
 import * as KoaRouter from 'koa-router';
 import { CakoView } from './view';
 import { CakoModel, CakoModelConfig, defaultCakoModelConfig, CakoModelDefine, CakoRelationDefine, CakoModels } from './model';
 import * as extend from 'extend';
-import { Sequelize } from 'sequelize/types';
+import { defaultCakoMiddlewareConfig, CakoMiddlewareConfig, CakoMiddleware, CakoMiddlewareProxy } from './middleware';
 
 export interface CakoServerConfig {
     /**
@@ -35,40 +34,12 @@ export interface CakoConfig {
      * cako server config
      */
     server?: CakoServerConfig,
+
+    /**
+     * cako middleware config
+     */
+    middleware: CakoMiddlewareConfig
 }
-
-export interface CakoLifeCycleFunction {
-    (
-        /**
-         * koa object
-         */
-        server: Koa,
-
-        /**
-         * koa-router object
-         */
-        router: KoaRouter,
-
-        /**
-         * CakoModel object
-         */
-        modelLoader: CakoModel,
-
-        /**
-         * CakoController object
-         */
-        controllerLoader: CakoController
-    ): void
-}
-
-export interface CakoLifeCycle {
-    beforeLoadModel?: CakoLifeCycleFunction,
-    beforeLoadController?: CakoLifeCycleFunction,
-    beforeLoadView?: CakoLifeCycleFunction,
-    beforeListen?: CakoLifeCycleFunction
-}
-
-const defaultCakoLifeCycle: CakoLifeCycle = {};
 
 const defaultCakoServerConfig: CakoServerConfig = {
     port: 25000
@@ -78,18 +49,19 @@ const defaultCakoConfig: CakoConfig = {
     model: defaultCakoModelConfig,
     controller: defaultCakoControllerConfig,
     view: defaultCakoViewConfig,
-    server: defaultCakoServerConfig
+    server: defaultCakoServerConfig,
+    middleware: defaultCakoMiddlewareConfig
 };
 
 export class Cako {
     private config: CakoConfig;
-    private lifeCycle: CakoLifeCycle;
 
     private server: Koa;
     private router: KoaRouter;
     
     private model: CakoModel;
     private controller: CakoController;
+    private middleware: CakoMiddleware;
     private view: CakoView;
 
     /**
@@ -114,11 +86,11 @@ export class Cako {
             this.config = defaultCakoConfig;
         }
 
-        this.lifeCycle = defaultCakoLifeCycle;
         this.server = new Koa();
         this.router = new KoaRouter();
         this.model = new CakoModel(this.config.model);
         this.controller = new CakoController(this.config.controller);
+        this.middleware = new CakoMiddleware(this.config.middleware, this.server);
         this.view = new CakoView(this.config.view, this.model, this.controller, this.router);
     }
 
@@ -127,109 +99,30 @@ export class Cako {
     }
 
     private loadModel(): Cako {
-        if (this.lifeCycle.beforeLoadModel) {
-            this.lifeCycle.beforeLoadModel(this.server, this.router, this.model, this.controller);
-        }
-
         this.model.load();
         return this;
     }
 
     private loadController(): Cako {
-        if (this.lifeCycle.beforeLoadController) {
-            this.lifeCycle.beforeLoadController(this.server, this.router, this.model, this.controller);
-        }
-
         this.controller.load();
         return this;
     }
 
-    private loadView(): Cako {
-        if (this.lifeCycle.beforeLoadView) {
-            this.lifeCycle.beforeLoadView(this.server, this.router, this.model, this.controller);
-        }
+    private loadMiddleware(): Cako {
+        this.middleware.load();
+        return this;
+    }
 
+    private loadView(): Cako {
         this.view.load();
         this.server.use(this.router.routes());
         return this;
     }
 
     private listen(): Cako {
-        if (this.lifeCycle.beforeListen) {
-            this.lifeCycle.beforeListen(this.server, this.router, this.model, this.controller);
-        }
-
         this.server.listen(this.config.server.port);
         console.log('cako > server is running ......');
         console.log(`cako > working port is ${this.config.server.port}`);
-        return this;
-    }
-
-    /**
-     * use life cycle function `beforeLoadModel`
-     * 
-     * for example:
-     * ```javascript
-     * cako.beforeLoadModel((server, router, modelLoader, controllerLoader) => {
-     *      // do some thing
-     * });
-     * ```
-     * @param lifeCycleFunc life cycle function
-     * @returns this `Cako` instance
-     */
-    public beforeLoadModel(lifeCycleFunc: CakoLifeCycleFunction): Cako {
-        this.lifeCycle.beforeLoadModel = lifeCycleFunc;
-        return this;
-    }
-
-    /**
-     * use life cycle function `beforeLoadController`
-     * 
-     * for example:
-     * ```javascript
-     * cako.beforeLoadController((server, router, modelLoader, controllerLoader) => {
-     *      // do some thing
-     * });
-     * ```
-     * @param lifeCycleFunc life cycle function
-     * @returns this `Cako` instance
-     */
-    public beforeLoadController(lifeCycleFunc: CakoLifeCycleFunction): Cako {
-        this.lifeCycle.beforeLoadController = lifeCycleFunc;
-        return this;
-    }
-
-    /**
-     * use life cycle function `beforeLoadView`
-     * 
-     * for example:
-     * ```javascript
-     * cako.beforeLoadView((server, router, modelLoader, controllerLoader) => {
-     *      // do some thing
-     * });
-     * ```
-     * @param lifeCycleFunc life cycle function
-     * @returns this `Cako` instance
-     */
-    public beforeLoadView(lifeCycleFunc: CakoLifeCycleFunction): Cako {
-        this.lifeCycle.beforeLoadView = lifeCycleFunc;
-        return this;
-    }
-
-    /**
-     * use life cycle function `beforeListen`
-     * 
-     * for example:
-     * ```javascript
-     * cako.beforeListen((server, router, modelLoader, controllerLoader) => {
-     *      // do some thing
-     * });
-     * ```
-     * @param lifeCycleFunc life cycle function
-     * @returns this `Cako` instance
-     */
-    public beforeListen(lifeCycleFunc: CakoLifeCycleFunction): Cako {
-        this.lifeCycle.beforeListen = lifeCycleFunc;
         return this;
     }
 
@@ -291,12 +184,17 @@ export class Cako {
     }
 
     /**
-     * use koa middleware
-     * @param middleware koa middleware
+     * usage:
+     * ```javascript
+     * cako.defineMiddleware(() => {
+     *      return // ... koa middleware
+     * });
+     * ```
+     * @param middlewareDefine middleware define proxy
      * @returns this `Cako` instance
      */
-    public useMiddleware(middleware: Middleware): Cako {
-        this.server.use(middleware);
+    public defineMiddleware(middlewareDefine: CakoMiddlewareProxy): Cako {
+        this.middleware.defineMiddleware(middlewareDefine);
         return this;
     }
 
@@ -312,6 +210,7 @@ export class Cako {
         return this
             .init()
             .loadModel()
+            .loadMiddleware()
             .loadController()
             .loadView()
             .listen();
