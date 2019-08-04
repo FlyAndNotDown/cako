@@ -215,4 +215,17 @@ export class Cako {
             .loadView()
             .listen();
     }
+
+    /**
+     * do not start server ,just sync the database
+     * 
+     * ```javascript
+     * cako.sync(true);
+     * ```
+     */
+    public sync(force: boolean): never {
+        this.loadModel();
+        this.model.sync(force);
+        return process.exit(0);
+    }
 }

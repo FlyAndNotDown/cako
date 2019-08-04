@@ -282,4 +282,10 @@ export class CakoModel {
     public defineRelation(relationDefine: CakoRelationDefine): void {
         this.relationDefines.push(relationDefine);
     }
+
+    public sync(force: boolean): void {
+        this.database.sync({
+            force: force
+        });
+    }
 }
