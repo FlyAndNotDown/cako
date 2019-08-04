@@ -38,7 +38,7 @@ server
         url: '/',
         get: (database, models) => {
             return async (context, next) => {
-                return context.response.body('hello');
+                return context.response.body = 'hello';
             };
         }
     })

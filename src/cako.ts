@@ -150,6 +150,7 @@ export class Cako {
         }
 
         this.view.load();
+        this.server.use(this.router.routes());
         return this;
     }
 
