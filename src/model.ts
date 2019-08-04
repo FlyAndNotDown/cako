@@ -181,6 +181,9 @@ export class CakoModel {
     private config: CakoModelConfig;
     private database: Sequelize;
     private models: CakoModels;
+
+    private modelDefines: CakoModelDefine[];
+    private relationDefines: CakoRelationDefine[];
     
     constructor(config: CakoModelConfig) {
         this.config = config;
@@ -212,6 +215,56 @@ export class CakoModel {
             this.database = null;
             this.models = null; 
         }
+
+        this.modelDefines = [];
+        this.relationDefines = [];
+    }
+
+    public load(): void {
+        if (this.config.useModel) {
+            this.modelDefines.forEach(modelDefine => {
+                class ModelClass extends Model {};
+                this.models[modelDefine.name] = ModelClass;
+                this.models[modelDefine.name].init(modelDefine.attributes, { sequelize: this.database, modelName: modelDefine.name });
+            });
+
+            this.relationDefines.forEach(relationDefine => {
+                switch (relationDefine.type) {
+                    case 'many2many':
+                        const many2ManyDescription: CakoRelationDefineMany2ManyDescription = relationDefine.description as CakoRelationDefineMany2ManyDescription;
+                        const many2ManyOwner1: string = many2ManyDescription.owner[0];
+                        const many2ManyOwner2: string = many2ManyDescription.owner[1];
+                        const many2ManyThrough: string = many2ManyDescription.through || `${many2ManyOwner1}${many2ManyOwner2}`;
+                        const many2ManyExtraAttributes: ModelAttributes = many2ManyDescription.extraAttributes || {};
+                        class Many2ManyRelationClass extends Model {};
+                        Many2ManyRelationClass.init(many2ManyExtraAttributes, { sequelize: this.database, modelName: many2ManyThrough });
+                        this.models[many2ManyOwner1].belongsToMany(this.models[many2ManyOwner2], { through: Many2ManyRelationClass });
+                        this.models[many2ManyOwner2].belongsToMany(this.models[many2ManyOwner1], { through: Many2ManyRelationClass });
+                        break;
+                    case 'one2many':
+                        const one2ManyDescription: CakoRelationDefineOne2ManyDescription = relationDefine.description as CakoRelationDefineOne2ManyDescription;
+                        const one2ManyOwner: string = one2ManyDescription.owner;
+                        const one2ManyTo: string = one2ManyDescription.to;
+                        if (one2ManyDescription.as) {
+                            const one2ManyAs: string = one2ManyDescription.as;
+                            this.models[one2ManyTo].belongsTo(this.models[one2ManyOwner], { as: one2ManyAs });
+                        } else {
+                            this.models[one2ManyTo].belongsTo(this.models[one2ManyOwner]);
+                        }
+                        this.models[one2ManyOwner].hasMany(this.models[one2ManyTo]);
+                        break;
+                    case 'hasOne':
+                        const hasOneDescription: CakoRelationDefineHasOneDescription = relationDefine.description as CakoRelationDefineHasOneDescription;
+                        const hasOneOwner: string = hasOneDescription.owner;
+                        const hasOneTo: string = hasOneDescription.to;
+                        if (hasOneDescription.as) {
+                            const hasOneAs: string = hasOneDescription.as;
+                            this.models[hasOneOwner].hasOne(this.models[hasOneTo], { as: hasOneAs });
+                        }
+                        break;
+                }
+            });
+        }
     }
 
     public getDatabase(): Sequelize {
@@ -223,49 +276,10 @@ export class CakoModel {
     }
 
     public defineModel(modelDefine: CakoModelDefine): void {
-        if (this.config.useModel) {
-            class ModelClass extends Model {};
-            this.models[modelDefine.name] = ModelClass;
-            this.models[modelDefine.name].init(modelDefine.attributes, { sequelize: this.database, modelName: modelDefine.name });
-        }
+        this.modelDefines.push(modelDefine);
     }
 
     public defineRelation(relationDefine: CakoRelationDefine): void {
-        if (this.config.useModel) {
-            switch (relationDefine.type) {
-                case 'many2many':
-                    const many2ManyDescription: CakoRelationDefineMany2ManyDescription = relationDefine.description as CakoRelationDefineMany2ManyDescription;
-                    const many2ManyOwner1: string = many2ManyDescription.owner[0];
-                    const many2ManyOwner2: string = many2ManyDescription.owner[1];
-                    const many2ManyThrough: string = many2ManyDescription.through || `${many2ManyOwner1}${many2ManyOwner2}`;
-                    const many2ManyExtraAttributes: ModelAttributes = many2ManyDescription.extraAttributes || {};
-                    class Many2ManyRelationClass extends Model {};
-                    Many2ManyRelationClass.init(many2ManyExtraAttributes, { sequelize: this.database, modelName: many2ManyThrough });
-                    this.models[many2ManyOwner1].belongsToMany(this.models[many2ManyOwner2], { through: Many2ManyRelationClass });
-                    this.models[many2ManyOwner2].belongsToMany(this.models[many2ManyOwner1], { through: Many2ManyRelationClass });
-                    break;
-                case 'one2many':
-                    const one2ManyDescription: CakoRelationDefineOne2ManyDescription = relationDefine.description as CakoRelationDefineOne2ManyDescription;
-                    const one2ManyOwner: string = one2ManyDescription.owner;
-                    const one2ManyTo: string = one2ManyDescription.to;
-                    if (one2ManyDescription.as) {
-                        const one2ManyAs: string = one2ManyDescription.as;
-                        this.models[one2ManyTo].belongsTo(this.models[one2ManyOwner], { as: one2ManyAs });
-                    } else {
-                        this.models[one2ManyTo].belongsTo(this.models[one2ManyOwner]);
-                    }
-                    this.models[one2ManyOwner].hasMany(this.models[one2ManyTo]);
-                    break;
-                case 'hasOne':
-                    const hasOneDescription: CakoRelationDefineHasOneDescription = relationDefine.description as CakoRelationDefineHasOneDescription;
-                    const hasOneOwner: string = hasOneDescription.owner;
-                    const hasOneTo: string = hasOneDescription.to;
-                    if (hasOneDescription.as) {
-                        const hasOneAs: string = hasOneDescription.as;
-                        this.models[hasOneOwner].hasOne(this.models[hasOneTo], { as: hasOneAs });
-                    }
-                    break;
-            }
-        }
+        this.relationDefines.push(relationDefine);
     }
 }

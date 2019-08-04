@@ -3,7 +3,7 @@ const Cako = require('../index');
 
 const server = new Cako({
     server: {
-        port: 68910
+        port: 4000
     } ,
     model: {
         useModel: true,
@@ -19,8 +19,7 @@ const server = new Cako({
                 acquire: 30000,
                 idle: 10000
             },
-            logging: false,
-            operatorsAliases: false
+            logging: false
         }
     }
 });
@@ -30,7 +29,8 @@ server
         name: 'user',
         attributes: {
             id: {
-                type: Sequelize.BIGINT
+                type: Sequelize.BIGINT,
+                primaryKey: true
             }
         }
     })

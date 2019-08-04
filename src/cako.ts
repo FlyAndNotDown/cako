@@ -115,11 +115,14 @@ export class Cako {
         }
 
         this.lifeCycle = defaultCakoLifeCycle;
+        this.server = new Koa();
+        this.router = new KoaRouter();
+        this.model = new CakoModel(this.config.model);
+        this.controller = new CakoController(this.config.controller);
+        this.view = new CakoView(this.config.view, this.model, this.controller, this.router);
     }
 
     private init(): Cako {
-        this.server = new Koa();
-        this.router = new KoaRouter();
         return this;
     }
 
@@ -128,7 +131,7 @@ export class Cako {
             this.lifeCycle.beforeLoadModel(this.server, this.router, this.model, this.controller);
         }
 
-        this.model = new CakoModel(this.config.model);
+        this.model.load();
         return this;
     }
 
@@ -137,7 +140,7 @@ export class Cako {
             this.lifeCycle.beforeLoadController(this.server, this.router, this.model, this.controller);
         }
 
-        this.controller = new CakoController(this.config.controller);
+        this.controller.load();
         return this;
     }
 
@@ -146,7 +149,6 @@ export class Cako {
             this.lifeCycle.beforeLoadView(this.server, this.router, this.model, this.controller);
         }
 
-        this.view = new CakoView(this.config.view, this.model, this.controller, this.router);
         this.view.load();
         return this;
     }
@@ -157,6 +159,8 @@ export class Cako {
         }
 
         this.server.listen(this.config.server.port);
+        console.log('cako > server is running ......');
+        console.log(`cako > working port is ${this.config.server.port}`);
         return this;
     }
 

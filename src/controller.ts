@@ -57,4 +57,6 @@ export class CakoController {
     public defineController(controllerDefine: CakoControllerDefine): void {
         this.controllers.push(controllerDefine);
     }
+
+    public load(): void {}
 }

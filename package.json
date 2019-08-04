@@ -27,6 +27,7 @@
     "extend": "^3.0.2",
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
-    "sequelize": "^5.10.1"
+    "sequelize": "^5.10.1",
+    "tedious": "^6.2.0"
   }
 }
