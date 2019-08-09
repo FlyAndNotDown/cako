@@ -1,13 +1,14 @@
 {
   "name": "cako",
   "version": "0.1.0",
-  "description": "",
+  "description": "🚀 A simple MVC web framework (Beta Version)",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "test": "mocha -r ts-node/register /test/**/*"
   },
   "author": "kindem",
+  "repository": "https://github.com/FlyAndNotDown/cako",
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.1.7",
