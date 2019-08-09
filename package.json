@@ -8,6 +8,7 @@
     "test": "mocha -r ts-node/register /test/**/*"
   },
   "author": "kindem",
+  "keywords": ["mvc", "web", "backend", "framework", "typescript", "cako"],
   "repository": "https://github.com/FlyAndNotDown/cako",
   "license": "MIT",
   "devDependencies": {
