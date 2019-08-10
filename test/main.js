@@ -11,7 +11,7 @@ const server = new Cako({
         username: 'development',
         password: 'development',
         options: {
-            dialect: 'mssql',
+            dialect: 'mysql',
             host: '134.175.59.165',
             pool: {
                 max: 5,
