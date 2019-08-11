@@ -17,7 +17,7 @@
 ---
 
 # 🤔 What is Cako ?
-`Cako` is a simple MVC web framework, you can consider it as a MVC http server. Many characteristics of `Cako` are similar to `Koa.js`. In fact, `Cako` is powered by `Koa.js`, but what is different is that `Cako` has default `ORM (Object Relational Mapping)` support, which is powered by a famous `ORM` framework - `Sequelize`.
+`Cako` is a simple MVC `Node.js` web framework, you can consider it as a MVC http server. Many characteristics of `Cako` are similar to `Koa.js`. In fact, `Cako` is powered by `Koa.js`, but what is different is that `Cako` has default `ORM (Object Relational Mapping)` support, which is powered by a famous `ORM` framework - `Sequelize`.
 
 In `Cako`, there are three significant conceptions:
 
@@ -32,14 +32,21 @@ I think you will love it.
 # 📦 Install
 use `npm`:
 
-```javascript
-npm install cako
+```
+npm install cako sequelize
 ```
 
 or use `yarn`:
 
+```
+yarn add cako sequelize
+```
+
+import:
+
 ```javascript
-yarn add cako
+const Cako = require('cako');
+const Sequelize = require('sequelize');
 ```
 
 # 🧀 Usages
