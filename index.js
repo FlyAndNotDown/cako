@@ -1,1 +1,4 @@
-module.exports = require('./dist/cako').Cako;
+module.exports = {
+    Cako: require('./dist/cako').Cako,
+    Sequelize: require('sequelize')
+};

@@ -1,5 +1,4 @@
-const Sequelize = require('sequelize');
-const Cako = require('../index');
+const { Cako, Sequelize } = require('../index');
 
 const server = new Cako({
     server: {
