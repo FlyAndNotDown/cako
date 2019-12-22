@@ -38,7 +38,7 @@ export interface CakoConfig {
     /**
      * cako middleware config
      */
-    middleware: CakoMiddlewareConfig
+    middleware?: CakoMiddlewareConfig
 }
 
 const defaultCakoServerConfig: CakoServerConfig = {

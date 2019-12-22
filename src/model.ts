@@ -1,4 +1,3 @@
-import { CakoRelationDefineMany2ManyDescription, CakoRelationDefineOne2ManyDescription, CakoRelationDefineHasOneDescription } from './model';
 import { Sequelize, Options, Model, ModelAttributes, ModelOptions, BuildOptions, HasManyOptions } from 'sequelize';
 
 export interface CakoModelConfig {
